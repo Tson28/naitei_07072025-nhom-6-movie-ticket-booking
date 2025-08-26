@@ -42,3 +42,20 @@
     background: rgba(255, 255, 255, 0.3);
     border-radius: 3px;
 }
+
+.container-fluid,
+.card,
+.card-body,
+.table-responsive,
+.table {
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+#statusFilter {
+    margin: 24px 0px;
+}
+
+.main_content {
+    margin-top: 32px;
+}

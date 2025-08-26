@@ -23,3 +23,5 @@
 .bi-person-bounding-box::before { content: "\f4d0"; }
 .bi-house::before { content: "\f425"; }
 .bi-gear::before { content: "\f3e5"; }
+.bi-eye::before { content: "\f33e"; }
+.bi-eye-fill::before { content: "\f33f"; }

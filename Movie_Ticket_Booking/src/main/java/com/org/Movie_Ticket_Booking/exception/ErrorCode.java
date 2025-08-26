@@ -46,7 +46,11 @@ public enum ErrorCode {
     DURATION_INVALID(44, "Thời lượng phải là số nguyên "),
     UPGRADE_EXISTING_PENDING(45, "Bạn đã gửi yêu cầu này và đang chờ duyệt"),
     UPGRADE_APPROVED(46, "Rạp này của bạn đã được phê duyệt, không thể gửi thêm"),
-    UPGRADE_EXISTING(47, "Rạp này đã được đăng kí, vui lòng điền thông tin khác");
+    UPGRADE_EXISTING(47, "Rạp này đã được đăng kí, vui lòng điền thông tin khác"),
+    REQUEST_NOT_FOUND(48, "Không tìm thấy yêu cầu đăng ký này"),
+    ROLE_NOT_FOUND(49, "Không tìm thấy role"),
+    INVALID_STATUS(50, "Trạng thái yêu cầu không hợp lệ"),
+    DATABASE_ERROR(51, "Database gặp lỗi");
 
     private int code;
     private String massage;

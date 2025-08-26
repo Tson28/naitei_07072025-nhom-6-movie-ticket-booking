@@ -19,4 +19,16 @@ public class UpgradeRqResponse {
     private String address;
     private String description;
     private UpgradeRequestStatus status;
+
+    public UpgradeRqResponse(Long upgradeRequestId,
+                             String userName,
+                             String email,
+                             LocalDateTime sentDate,
+                             UpgradeRequestStatus status) {
+        this.upgradeRequestId = upgradeRequestId;
+        this.userName = userName;
+        this.email = email;
+        this.sentDate = sentDate;
+        this.status = status;  //jpa has 5 parameter query
+    }
 }

@@ -37,8 +37,9 @@ public class GlobalExceptionHandler {
         mav.addObject("path", path);
         return mav;
     }
+
     @ExceptionHandler(AppException.class)
-    public Object handleAppException(AppException e, HttpServletRequest request){
+    public Object handleAppException(AppException e, HttpServletRequest request) {
         ErrorCode errorCode = e.getErrorCode();
         if (isApiRequest(request)) {
             return buildApiResponse(errorCode.getCode(), errorCode.getMassage(), request.getRequestURI());
@@ -70,7 +71,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public Object fallback(Exception e, HttpServletRequest request){
+    public Object fallback(Exception e, HttpServletRequest request) {
         if (isApiRequest(request)) {
             return buildApiResponse(ErrorCode.UNIDENTIFIED_ERROR.getCode(),
                     ErrorCode.UNIDENTIFIED_ERROR.getMassage(),
@@ -119,4 +120,29 @@ public class GlobalExceptionHandler {
         }
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public Object handleIllegalArgument(IllegalArgumentException ex, HttpServletRequest request) {
+        if (isApiRequest(request)) {
+            return buildApiResponse(ErrorCode.INVALID_STATUS.getCode(),
+                    ErrorCode.INVALID_STATUS.getMassage(),
+                    request.getRequestURI());
+        } else {
+            return buildViewResponse("error",
+                    ErrorCode.INVALID_STATUS.getMassage(),
+                    request.getRequestURI());
+        }
+    }
+
+    @ExceptionHandler(org.springframework.dao.DataAccessException.class)
+    public Object handleDatabaseError(org.springframework.dao.DataAccessException ex, HttpServletRequest request) {
+        if (isApiRequest(request)) {
+            return buildApiResponse(ErrorCode.DATABASE_ERROR.getCode(),
+                    ErrorCode.DATABASE_ERROR.getMassage(),
+                    request.getRequestURI());
+        } else {
+            return buildViewResponse("error",
+                    ErrorCode.DATABASE_ERROR.getMassage(),
+                    request.getRequestURI());
+        }
+    }
 }

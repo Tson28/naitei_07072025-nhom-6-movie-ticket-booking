@@ -1,4 +1,120 @@
-<div th:fragment="content">
-  <h1>Danh sách yêu cầu nâng cấp thành Cinema</h1>
+<div th:fragment="content"  class="container-fluid w-100">
+  <h2 th:text="#{upgradeRq.page.title}">Danh sách yêu cầu nâng cấp thành Cinema</h2>
+  <div>
+    <div class="col-md-3">
+      <select class="form-select" id="statusFilter" name="statusFilter" onchange="filterStatus(this.value)">
+        <option value="" th:text="#{upgradeRq.filter.status.all}">-- Tất cả trạng thái --</option>
+        <option th:each="s : ${statuses}"
+                th:with="key='upgradeRq.filter.status.' + ${s.name().toLowerCase()}"
+                th:value="${s.name()}"
+                th:text="#{${key}}"
+                th:selected="${s.name() == status}">
+        </option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Table list requests -->
+  <div class="card shadow-sm w-100">
+    <div class="card-body p-0 w-100">
+      <div class="table-responsive w-100">
+        <table class="table table-striped mb-0 align-middle" >
+          <thead class="table-dark">
+          <tr>
+            <th scope="col" th:text="#{upgradeRq.table.header.index}">#</th>
+            <th scope="col" th:text="#{upgradeRq.table.header.user}">Người dùng</th>
+            <th scope="col" th:text="#{upgradeRq.table.header.email}">Email</th>
+            <th scope="col" th:text="#{upgradeRq.table.header.sentDate}">Ngày gửi</th>
+            <th scope="col" th:text="#{upgradeRq.table.header.status}">Trạng thái</th>
+            <th scope="col" class="text-center" th:text="#{upgradeRq.table.header.detail}">Xem chi tiết</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="req, iterStat : ${requests.content}">
+            <td th:text="${iterStat.index + 1}">1</td>
+            <td th:text="${req.userName}">demoUser</td>
+            <td th:text="${req.email}">demo@mail.com</td>
+            <td th:text="${#temporals.format(req.sentDate, 'dd/MM/yyyy HH:mm')}">20/08/2025</td>
+            <td>
+                        <span th:switch="${req.status.name()}">
+                            <span th:case="'PENDING'" class="badge bg-warning text-dark">Pending</span>
+                            <span th:case="'APPROVED'" class="badge bg-success">Approved</span>
+                            <span th:case="'REJECTED'" class="badge bg-danger">Rejected</span>
+                        </span>
+            </td>
+            <td class="text-center">
+              <button type="button" class="btn btn-sm btn-outline-primary"
+                      th:onclick="|showDetail(${req.upgradeRequestId})|">
+                <i class="bi bi-eye"></i>
+              </button>
+            </td>
+          </tr>
+          <tr th:if="${#lists.isEmpty(requests.content)}">
+            <td colspan="6" class="text-center text-muted" th:text="#{upgradeRq.table.empty}">Không có yêu cầu nào</td>
+          </tr>
+          </tbody>
+        </table>
+
+      </div>
+    </div>
+  </div>
+  <!-- Pagination -->
+  <nav th:if="${requests.totalPages > 1}" aria-label="Page navigation">
+    <ul class="pagination justify-content-center mt-3">
+
+      <!-- Previous -->
+      <li class="page-item" th:classappend="${requests.first} ? 'disabled'">
+        <a class="page-link"
+           th:href="@{/admin/request_cinemas(status=${status}, page=${requests.number - 1}, size=${requests.size})}">
+          «
+        </a>
+      </li>
+
+      <!-- Page numbers -->
+      <li th:each="i : ${#numbers.sequence(0, requests.totalPages - 1)}"
+          th:classappend="${i == requests.number} ? 'active'"
+          class="page-item">
+        <a class="page-link"
+           th:text="${i + 1}"
+           th:href="@{/admin/request_cinemas(status=${status}, page=${i}, size=${requests.size})}">
+        </a>
+      </li>
+
+      <!-- Next -->
+      <li class="page-item" th:classappend="${requests.last} ? 'disabled'">
+        <a class="page-link"
+           th:href="@{/admin/request_cinemas(status=${status}, page=${requests.number + 1}, size=${requests.size})}">
+          »
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Modal details-->
+  <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" th:text="#{upgradeRq.modal.title}">Chi tiết yêu cầu nâng cấp</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+        </div>
+        <div class="modal-body">
+          <!-- Thông báo lỗi -->
+          <div id="modalErrorMsg" class="alert alert-danger d-none"></div>
+
+          <p><b th:text="#{upgradeRq.modal.cinemaName}">Tên rạp:</b> <span id="modalCinemaName">-</span></p>
+          <p><b th:text="#{upgradeRq.modal.address}">Địa chỉ:</b> <span id="modalAddress">-</span></p>
+          <p><b th:text="#{upgradeRq.modal.description}">Mô tả:</b> <span id="modalDescription">-</span></p>
+          <p><b th:text="#{upgradeRq.modal.user}">Người dùng:</b> <span id="modalUser">-</span></p>
+          <p><b th:text="#{upgradeRq.modal.email}">Email:</b> <span id="modalEmail">-</span></p>
+          <p><b th:text="#{upgradeRq.modal.date}">Ngày gửi:</b> <span id="modalDate">-</span></p>
+          <p><b th:text="#{upgradeRq.modal.status}">Trạng thái:</b> <span id="modalStatus">-</span></p>
+        </div>
+        <div class="modal-footer" id="modalActions">
+          <!-- Action buttons sẽ render bằng JS -->
+        </div>
+      </div>
+    </div>
+  </div>
 
 </div>

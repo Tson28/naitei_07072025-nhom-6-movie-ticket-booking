@@ -12,9 +12,12 @@ import com.org.Movie_Ticket_Booking.repository.UpgradeRequestRepository;
 import com.org.Movie_Ticket_Booking.repository.UserRepository;
 import com.org.Movie_Ticket_Booking.service.UpgradeRequestService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 @Service
@@ -33,9 +36,40 @@ public class UpgradeRequestServiceImpl implements UpgradeRequestService {
         return upgradeRequestMapper.toClientResponse(upgradeRequest);
     }
 
+    @Override
+    public Page<UpgradeRqResponse> getAllRequest(Pageable pageable) {
+        return upgradeRequestRepository.findAllRequest(pageable);
+    }
+
+    @Override
+    public Page<UpgradeRqResponse> getRequestsByStatus(String status, Pageable pageable) {
+        UpgradeRequestStatus enumStatus = null;
+        if (status !=  null && !status.isBlank()){
+            boolean isValid = Arrays.stream(UpgradeRequestStatus.values())
+                    .anyMatch(s -> s.name().equalsIgnoreCase(status));
+
+            if (!isValid) {
+                throw new AppException(ErrorCode.INVALID_STATUS);
+            }
+            enumStatus = UpgradeRequestStatus.valueOf(status.toUpperCase());
+        }
+        return upgradeRequestRepository.findAllRequest(enumStatus, pageable);
+    }
+
+    @Override
+    public UpgradeRqResponse getDetailByID(Long id) {
+        getRequest(id);
+        return upgradeRequestRepository.findDetailById(id);
+    }
+
     private User getUser(Long userID){
         return  userRepository.findById(userID)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+    }
+
+    private UpgradeRequest getRequest(Long requestID){
+        return upgradeRequestRepository.findById(requestID)
+                .orElseThrow(() -> new AppException(ErrorCode.REQUEST_NOT_FOUND));
     }
 
     private void checkDuplicateCinemaGlobal(UpgradeRqDTO dto) {
